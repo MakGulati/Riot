@@ -17,4 +17,6 @@ QUIET ?= 1
 # Features required
 FEATURES_REQUIRED += cpp # basic C++ support
 FEATURES_REQUIRED += libstdcpp # libstdc++ support (for #include <cstdio>)
+USEMODULE += cpp_new_delete
+
 include $(RIOTBASE)/Makefile.include

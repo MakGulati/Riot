@@ -1,12 +1,19 @@
-#include <iostream>
+#include <stdio.h>
+#include <cstdio>
 using namespace std;
 
 int main()
 {
     // int a[10][10], b[10][10], mult[10][10], r1, c1, r2, c2, i, j, k;
+    int r1, c1;
+    printf("Enter rows and columns for first matrix: ");
+    scanf("%d,%d", &r1, &c1);
+    printf("r1=%d", r1);
+    // int r1;
+    // printf("Enter rows and columns for first matrix: ");
+    // scanf("%i", &r1);
+    // printf("r1=%i", r1);
 
-    // cout << "Enter rows and columns for first matrix: ";
-    // cin >> r1 >> c1;
     // cout << "Enter rows and columns for second matrix: ";
     // cin >> r2 >> c2;
 
