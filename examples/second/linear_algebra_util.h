@@ -7,15 +7,15 @@
 
 class LinearAlgebraUtil {
  public:
-  static std::vector<double> subtract_vector(std::vector<double> v1, std::vector<double> v2);
+  static std::vector<float> subtract_vector(std::vector<float> v1, std::vector<float> v2);
 
-  static std::vector<double> multiply_matrix_vector(std::vector<std::vector<double>> mat, std::vector<double> v);
+  static std::vector<float> multiply_matrix_vector(std::vector<std::vector<float>> mat, std::vector<float> v);
 
-  static std::vector<double> add_vector_scalar(std::vector<double> v, double a);
+  static std::vector<float> add_vector_scalar(std::vector<float> v, int a);
 
-  static std::vector<double> multiply_vector_scalar(std::vector<double> v, double a);
+  static std::vector<float> multiply_vector_scalar(std::vector<float> v, int a);
 
-  static std::vector<std::vector<double>> transpose_vector(std::vector<std::vector<double>> v);
+  static std::vector<std::vector<float>> transpose_vector(std::vector<std::vector<float>> v);
 
 };
 
