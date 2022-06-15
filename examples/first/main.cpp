@@ -6,7 +6,11 @@ int main()
 {
     // int a[10][10], b[10][10], mult[10][10], r1, c1, r2, c2, i, j, k;
     int r1, c1;
-    printf("Enter rows and columns for first matrix: ");
+    puts("Hello World!");
+
+    printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
+    printf("This board features a(n) %s MCU.\n", RIOT_MCU);
+    puts("Enter rows and columns for first matrix: ");
     scanf("%d,%d", &r1, &c1);
     printf("r1=%d", r1);
     // int r1;
