@@ -4,12 +4,26 @@
 using namespace std;
 int main(int, char **)
 {
-    vector<float> point_A{1.0, 2, 4, 6, 5, 7};
+    vector<vector<float>> mat_A{{1.00, 2, 4, 6, 5, 7}, {1.00, 2, 4, 6, 5, 7}, {1.00, 2, 4, 6, 5, 7}, {1.00, 2, 4, 6, 5, 7}};
     vector<float> point_B{1, 2.0, 6.0, 6, 5, 7};
-    std::vector<float> err(point_A.size(), 1);
-    err = LinearAlgebraUtil::subtract_vector(point_A, point_B);
-    for (unsigned int i = 0; i < err.size(); i++)
+    for (unsigned int i = 0; i < mat_A.size(); i++)
     {
-        printf("error: %f\n", err[i]);
+        {
+            for (unsigned int j = 0; j < mat_A[0].size(); j++)
+                printf(" %0.1f", mat_A[i][j]);
+        }
+        printf("\n");
+    }
+    puts("--------------------------------");
+    std::vector<std::vector<float>> result(mat_A[0].size(), std::vector<float>(mat_A.size()));
+    result = LinearAlgebraUtil::transpose_vector(mat_A);
+
+    for (unsigned int i = 0; i < result.size(); i++)
+    {
+        {
+            for (unsigned int j = 0; j < result[0].size(); j++)
+                printf(" %0.1f", result[i][j]);
+        }
+        printf("\n");
     }
 }

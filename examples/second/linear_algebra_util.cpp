@@ -28,7 +28,7 @@ LinearAlgebraUtil::multiply_matrix_vector(std::vector<std::vector<float>> mat, s
     return result;
 }
 
-std::vector<float> LinearAlgebraUtil::add_vector_scalar(std::vector<float> v, int a)
+std::vector<float> LinearAlgebraUtil::add_vector_scalar(std::vector<float> v, float a)
 {
     for (unsigned int i = 0; i < v.size(); i++)
     {
@@ -37,7 +37,7 @@ std::vector<float> LinearAlgebraUtil::add_vector_scalar(std::vector<float> v, in
     return v;
 }
 
-std::vector<float> LinearAlgebraUtil::multiply_vector_scalar(std::vector<float> v, int a)
+std::vector<float> LinearAlgebraUtil::multiply_vector_scalar(std::vector<float> v, float a)
 {
     for (unsigned int i = 0; i < v.size(); i++)
     {

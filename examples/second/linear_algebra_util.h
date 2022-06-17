@@ -11,9 +11,9 @@ class LinearAlgebraUtil {
 
   static std::vector<float> multiply_matrix_vector(std::vector<std::vector<float>> mat, std::vector<float> v);
 
-  static std::vector<float> add_vector_scalar(std::vector<float> v, int a);
+  static std::vector<float> add_vector_scalar(std::vector<float> v, float a);
 
-  static std::vector<float> multiply_vector_scalar(std::vector<float> v, int a);
+  static std::vector<float> multiply_vector_scalar(std::vector<float> v, float a);
 
   static std::vector<std::vector<float>> transpose_vector(std::vector<std::vector<float>> v);
 
