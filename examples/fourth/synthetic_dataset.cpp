@@ -16,9 +16,9 @@ SyntheticDataset::SyntheticDataset(std::vector<float> ms, float b, size_t size)
     {
         // std::cout << std::fixed << "  m" << i << " = " << ms[i] << std::endl;
         puts(" inside dataset");
-        printf(" %f \n", ms[i]);
+        printf("true wts %f \n", ms[i]);
     }
-
+    printf(" true bias %f \n", b);
     // std::cout << "  b = " << std::fixed << b << std::endl;
 
     std::vector<std::vector<float>> xs(size, std::vector<float>(ms.size()));
@@ -43,7 +43,7 @@ SyntheticDataset::SyntheticDataset(std::vector<float> ms, float b, size_t size)
     }
 
     std::vector<std::vector<float>> data_points;
-    for (unsigned int i = 0; i < size; i++)
+    for (size_t i = 0; i < size; i++)
     {
         std::vector<float> data_point;
         data_point.insert(data_point.end(), xs[i].begin(), xs[i].end());
