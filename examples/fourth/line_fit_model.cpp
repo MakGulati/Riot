@@ -1,11 +1,8 @@
-//
-// Created by Andreea Zaharia on 01/02/2022.
-//
+
 
 #include "line_fit_model.h"
 #include "synthetic_dataset.h"
 
-// #include <iostream>
 #include <vector>
 #include <algorithm>
 #include <random>
@@ -70,7 +67,7 @@ std::tuple<size_t, float, float> LineFitModel::train_SGD(SyntheticDataset &datas
     std::vector<std::vector<float>> data_points = dataset.get_data_points();
 
     std::vector<float> data_indices(dataset.size());
-    for (unsigned int i = 0; i < dataset.size(); i++)
+    for (std::size_t i = 0; i < dataset.size(); i++)
     {
         data_indices.push_back(i);
     }
@@ -122,10 +119,10 @@ std::tuple<size_t, float, float> LineFitModel::train_SGD(SyntheticDataset &datas
     puts("Local model:\n");
     for (size_t i = 0; i < pred_weights.size(); i++)
     {
-        printf("m %d _local = %f \n", i, pred_weights[i]);
+        printf("m%d_local = %f \n", i, pred_weights[i]);
     }
     printf("b_local= %f \n \n", pred_b);
-    float accuracy = training_error;
+    float accuracy = 1 / training_error;
     return std::make_tuple(dataset.size(), training_error, accuracy);
 }
 
@@ -141,19 +138,21 @@ float LineFitModel::compute_mse(std::vector<float> true_y, std::vector<float> pr
     return error / (1.0 * true_y.size());
 }
 
-// std::tuple<size_t, float, float> LineFitModel::evaluate(SyntheticDataset &test_dataset) {
-//     std::vector<std::vector<float>> data_points = test_dataset.get_data_points();
-//     int num_features = data_points[0].size();
-//     std::vector<std::vector<float>> X(test_dataset.size(), std::vector<float>(num_features));
-//     std::vector<float> y(test_dataset.size());
+std::tuple<size_t, float, float> LineFitModel::evaluate(SyntheticDataset &test_dataset)
+{
+    std::vector<std::vector<float>> data_points = test_dataset.get_data_points();
+    int num_features = data_points[0].size();
+    std::vector<std::vector<float>> X(test_dataset.size(), std::vector<float>(num_features));
+    std::vector<float> y(test_dataset.size());
 
-//     for (unsigned int i = 0; i < test_dataset.size(); i++) {
-//         std::vector<float> point = data_points[i];
-//         y[i] = point.back();
-//         point.pop_back();
-//         X[i] = point;
-//     }
+    for (unsigned int i = 0; i < test_dataset.size(); i++)
+    {
+        std::vector<float> point = data_points[i];
+        y[i] = point.back();
+        point.pop_back();
+        X[i] = point;
+    }
 
-//     float test_loss = compute_mse(y, predict(X));
-//     return std::make_tuple(test_dataset.size(), test_loss, test_loss);
-// }
+    float test_loss = compute_mse(y, predict(X));
+    return std::make_tuple(test_dataset.size(), test_loss, test_loss);
+}

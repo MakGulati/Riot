@@ -19,6 +19,8 @@ public:
 
   std::tuple<std::size_t, float, float> train_SGD(SyntheticDataset &dataset);
 
+  std::tuple<float, float> train_SGD2(SyntheticDataset &dataset);
+
   std::tuple<std::size_t, float, float> evaluate(SyntheticDataset &test_dataset);
 
   std::vector<float> get_pred_weights();
