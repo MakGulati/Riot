@@ -1,8 +1,8 @@
-APPLICATION = fourth
+APPLICATION = udp_server
 # name of the application
 
 # If no BOARD is found in the environment, use this default:
-BOARD ?= arduino-nano-33-ble
+BOARD ?= make BOARD=nrf52840dk 
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
@@ -16,9 +16,15 @@ DEVELHELP ?= 1
 QUIET ?= 1
 # Features required
 FEATURES_REQUIRED += cpp # basic C++ support
-FEATURES_REQUIRED += libstdcpp # libstdc++ support (for #include <cstdio>)
-USEMODULE += cpp_new_delete
-USEMODULE += printf_float
+# FEATURES_REQUIRED += libstdcpp # libstdc++ support (for #include <cstdio>)
+# USEMODULE += cpp_new_delete
+# USEMODULE += printf_float
+USEMODULE += sht11
+USEMODULE += gnrc_ipv6_default
+USEMODULE += gnrc_udp
+USEMODULE += gnrc_sock_check_reuse
+USEMODULE += gnrc_sock_udp
+USEMODULE += gnrc_ipv6
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(6*THREAD_STACKSIZE_DEFAULT\)
 
 include $(RIOTBASE)/Makefile.include

@@ -4,12 +4,11 @@ make BOARD=nrf52840dk
 ```
 ### Flash on board
 ```bash
-make BOARD=nrf52840dk -C examples/fourth/ flash
+make BOARD=nrf52840dk -C . flash
 
 ```
 ### Terminal output on board
 ```bash
-make BOARD=nrf52840dk -C examples/fourth/ term
+make BOARD=nrf52840dk -C . term
 
 ```
-
