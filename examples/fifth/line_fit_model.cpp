@@ -110,7 +110,7 @@ std::tuple<size_t, float, float> LineFitModel::train_SGD(SyntheticDataset &datas
             LinearAlgebraUtil::subtract_vector(pW, LinearAlgebraUtil::multiply_vector_scalar(dW, learning_rate));
         this->pred_b = pB - learning_rate * dB;
 
-        if (iteration % 100== 0)
+        if (iteration % 100 == 0)
         {
             training_error = this->compute_mse(y, predict(X));
             printf("Iteration:%d and Training error: %f \n", iteration, training_error);
