@@ -12,17 +12,64 @@
 #include "gcoap_example.h"
 
 char request_path[] = "/cli/stats_test";
-coap_pkt_t pdu;
 uint8_t buf[CONFIG_GCOAP_PDU_BUF_SIZE];
 size_t len;
 
-/* initialize request */
-gcoap_req_init(pdu, buf, CONFIG_GCOAP_PDU_BUF_SIZE, COAP_METHOD_FETCH, request_path);
-/* Optionally add some options */
-coap_opt_add_format(pdu, COAP_FORMAT_CBOR);
-/* finish the headers and indicate that there is a payload */
-len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
-/* Copy in the payload, TODO: length check */
-memcpy(pdu.payload, payload_buffer, payload_len);
+static bool _parse_endpoint(sock_udp_ep_t *remote,
+                            const char *addr_str, uint16_t port)
+{
+    netif_t *netif;
 
-gcoap_req_send(buf, len + payload_len, sock_remote, NULL, NULL);
+    /* parse hostname */
+    if (netutils_get_ipv6((ipv6_addr_t *)&remote->addr, &netif, addr_str) < 0)
+    {
+        puts("gcoap_cli: unable to parse destination address");
+        return false;
+    }
+
+    /* Set the endpoint members */
+    remote->netif = netif ? netif_get_id(netif) : SOCK_ADDR_ANY_NETIF;
+    remote->family = AF_INET6;
+
+    remote->port = port;
+    return true;
+}
+
+ssize_t _send_coap_req(uint8_t *buf, size_t len, const char *dest_address,
+        gcoap_resp_handler_t resp_handler, void *context)
+{
+    sock_udp_ep_t remote;
+    if (!_parse_endpoint(&remote, dest_address, COAP_PORT))
+    {
+        /* unable to parse the endpoint address, exit */
+        return 0;
+    }
+    /* Ask gcoap to send the request */
+    return gcoap_req_send(buf, len, &remote, resp_handler, context);
+}
+
+/**
+ * @brief Send out a coap GET request to the destination IP and endpoint.
+ *
+ * The supplied callbacks are called when the request is complete.
+ *
+ * @note Not thread safe
+ *
+ * @param   dest_ip         Destination address as string
+ * @param   endpoint        CoAP endpoint to query
+ * @param   resp_handler    Callback for the reply
+ * @param   context         Optional context pointer that will be supplied with
+ *                          the callback
+ */
+ssize_t coap_request(const char *dest_ip, const char *endpoint,
+        gcoap_resp_handler_t resp_handler, void *context)
+{
+    coap_pkt_t pdu;
+    /* initialize request */
+    gcoap_req_init(&pdu, buf, CONFIG_GCOAP_PDU_BUF_SIZE, COAP_METHOD_GET, endpoint);
+    /* Set it as confirmable */
+    coap_hdr_set_type(pdu.hdr, COAP_TYPE_CON);
+    /* No other options and no payload in a GET request  */
+    len = coap_opt_finish(&pdu, COAP_OPT_FINISH_NONE);
+    return _send_coap_req(buf, len, dest_ip, resp_handler, context);
+}
