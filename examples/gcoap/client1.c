@@ -36,7 +36,7 @@ static bool _parse_endpoint(sock_udp_ep_t *remote,
 }
 
 ssize_t _send_coap_req(uint8_t *buf, size_t len, const char *dest_address,
-        gcoap_resp_handler_t resp_handler, void *context)
+                       gcoap_resp_handler_t resp_handler, void *context)
 {
     sock_udp_ep_t remote;
     if (!_parse_endpoint(&remote, dest_address, COAP_PORT))
@@ -61,8 +61,34 @@ ssize_t _send_coap_req(uint8_t *buf, size_t len, const char *dest_address,
  * @param   context         Optional context pointer that will be supplied with
  *                          the callback
  */
+
+gcoap_resp_handler_t _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
+                                   const sock_udp_ep_t *remote)
+{
+
+    (void)remote; /* not interested in the source currently */
+    (void)memo;
+    // if (memo->state == GCOAP_MEMO_TIMEOUT)
+    // {
+    //     printf("gcoap: timeout for msg ID %02u\n", coap_get_id(pdu));
+    //     return;
+    // }
+    // else if (memo->state == GCOAP_MEMO_RESP_TRUNC)
+    // {
+
+    //     printf("gcoap: warning, incomplete response; continuing with the truncated payload\n");
+    // }
+    // else if (memo->state != GCOAP_MEMO_RESP)
+    // {
+    //     printf("gcoap: error in response\n");
+    //     return;
+    // }
+    printf("gcoap client printing payload: %d", pdu->payload_len);
+    // return ;
+}
+
 ssize_t coap_request(const char *dest_ip, const char *endpoint,
-        gcoap_resp_handler_t resp_handler, void *context)
+                     gcoap_resp_handler_t resp_handler, void *context)
 {
     coap_pkt_t pdu;
     /* initialize request */
@@ -73,3 +99,5 @@ ssize_t coap_request(const char *dest_ip, const char *endpoint,
     len = coap_opt_finish(&pdu, COAP_OPT_FINISH_NONE);
     return _send_coap_req(buf, len, dest_ip, resp_handler, context);
 }
+
+print("%d ", coap_request("2001:db8::1", request_path, _resp_handler, 0));
