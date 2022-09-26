@@ -61,32 +61,6 @@ ssize_t _send_coap_req(uint8_t *buf, size_t len, const char *dest_address,
  * @param   context         Optional context pointer that will be supplied with
  *                          the callback
  */
-
-gcoap_resp_handler_t _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
-                                   const sock_udp_ep_t *remote)
-{
-
-    (void)remote; /* not interested in the source currently */
-    (void)memo;
-    // if (memo->state == GCOAP_MEMO_TIMEOUT)
-    // {
-    //     printf("gcoap: timeout for msg ID %02u\n", coap_get_id(pdu));
-    //     return;
-    // }
-    // else if (memo->state == GCOAP_MEMO_RESP_TRUNC)
-    // {
-
-    //     printf("gcoap: warning, incomplete response; continuing with the truncated payload\n");
-    // }
-    // else if (memo->state != GCOAP_MEMO_RESP)
-    // {
-    //     printf("gcoap: error in response\n");
-    //     return;
-    // }
-    printf("gcoap client printing payload: %d", pdu->payload_len);
-    // return ;
-}
-
 ssize_t coap_request(const char *dest_ip, const char *endpoint,
                      gcoap_resp_handler_t resp_handler, void *context)
 {
@@ -100,4 +74,89 @@ ssize_t coap_request(const char *dest_ip, const char *endpoint,
     return _send_coap_req(buf, len, dest_ip, resp_handler, context);
 }
 
-print("%d ", coap_request("2001:db8::1", request_path, _resp_handler, 0));
+//print("%d ", coap_request("2001:db8::1", request_path, _resp_handler, 0));
+
+
+typedef struct {
+    mutex_t waiter;
+    int result;
+    float *values;
+    size_t num_values;
+} coap_float_ctx_t;
+
+
+void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
+                                   const sock_udp_ep_t *remote)
+{
+    (void)remote;
+    coap_float_ctx_t *ctx = memo->context;
+
+    /* timeout, nothing received */
+    if (memo->state == GCOAP_MEMO_TIMEOUT)
+    {
+        ctx->result = -1;
+    }
+    /* truncated response, can't help it */
+    else if (memo->state == GCOAP_MEMO_RESP_TRUNC)
+    {
+        ctx->result = -2;
+    }
+    /* Other errors */
+    else if (memo->state != GCOAP_MEMO_RESP)
+    {
+        ctx->result = -3;
+    }
+
+    else {
+        /* try decoding */
+
+        if (coap_get_code_class(pdu) != COAP_CLASS_SUCCESS) {
+            ctx->result = -4;
+        }
+        else {
+            nanocbor_value_t decoder, array;
+            nanocbor_decoder_init(&decoder, pdu->payload, pdu->payload_len);
+            if (nanocbor_enter_array(&decoder, &array) < 0) {
+                ctx->result = -5;
+            }
+            else {
+                for (size_t i = 0; i < ctx->num_values; i++) {
+                    if (nanocbor_get_float(&array, &ctx->values[i]) < 0) {
+                        break;
+                    }
+                }
+                ctx->result = 0;
+            }
+        }
+    }
+    mutex_unlock(&ctx->waiter);
+}
+
+/**
+ * @brief Send out a coap GET request to the destination IP and endpoint and
+ * parse the reply for CBOR floats.
+ *
+ * @param   dest_ip         Destination address as string
+ * @param   endpoint        CoAP endpoint to query
+ * @param   values          Pointer to an array of floats to fill
+ * @param   num_values      Number of floats in the array
+ *
+ * @return  0 on success, negative on CoAP error
+ */
+int coap_query_floats(const char *dest_ip, const char *endpoint, float *values, size_t num_values)
+{
+    coap_float_ctx_t ctx;
+
+    /* init the context struct to sane values */
+    ctx.result = 0;
+    mutex_init(&ctx.waiter);
+    mutex_lock(&ctx.waiter);
+    ctx.values = values;
+    ctx.num_values = num_values;
+
+    coap_request(dest_ip, endpoint, _resp_handler, &ctx);
+
+    /* wait for the response handler to unlock the context struct */
+    mutex_lock(&ctx.waiter);
+    return ctx.result;
+}
