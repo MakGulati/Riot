@@ -42,6 +42,7 @@ USEMODULE += netutils
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
+USEMODULE += printf_float
 # using nanacbor
 USEPKG += nanocbor
 

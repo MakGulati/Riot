@@ -45,16 +45,18 @@ int main(void)
     puts("All up, running the shell now");
     // char line_buf[SHELL_DEFAULT_BUFSIZE];
     // shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
-    float *output_data = 0;
+    float output_data[4];
+    float *ptr_array;
+    ptr_array=output_data;
 
-    coap_query_floats("2001:db8::1", "/cli/stats_test", output_data, 4);
+    coap_query_floats("2001:db8::1", "/cli/stats_test", ptr_array, 4);
 
     for (size_t i = 0; i < 4; i++)
     {
-        // printf("output_data_data_%d:\n", i);
-        printf("at address:%p val: %f", output_data, *output_data);
+        printf("output_data_data_%d:\n", i);
+        printf("at address:%p val: %f", ptr_array, *ptr_array);
 
-        output_data++;
+        ptr_array++;
 
         /* should never be reached */
         return 0;
