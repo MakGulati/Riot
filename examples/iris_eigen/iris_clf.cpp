@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include "blob/iris_data/iris_aug_train.csv.h"
+#include "blob/iris_data/iris_aug_test.csv.h"
 
 using namespace Eigen;
 using namespace std;
@@ -95,30 +97,24 @@ private:
     VectorXd hiddenLayer, outputLayer;
 };
 
-pair<MatrixXd, MatrixXd> readCSV(const string &filename, int numFeatures, int numLabels)
+pair<MatrixXd, MatrixXd> readCSV(istringstream &iss, int numFeatures, int numLabels)
 {
-    ifstream file(filename);
-    if (!file.is_open())
-    {
-        cerr << "Error opening file: " << filename << endl;
-        exit(1);
-    }
 
-    vector<vector<double>> data;
-    string line;
-    while (getline(file, line))
+    std::string line;
+    std::vector<std::vector<double>> data;
+
+    while (std::getline(iss, line, '\n'))
     {
-        stringstream ss(line);
-        vector<double> row;
-        double val;
-        while (ss >> val)
+        std::istringstream line_stream(line);
+        std::string cell;
+        std::vector<double> row;
+
+        while (std::getline(line_stream, cell, ','))
         {
-            row.push_back(val);
-            if (ss.peek() == ',')
-            {
-                ss.ignore();
-            }
+            double value = std::stof(cell);
+            row.push_back(value);
         }
+
         data.push_back(row);
     }
 
@@ -143,13 +139,14 @@ pair<MatrixXd, MatrixXd> readCSV(const string &filename, int numFeatures, int nu
 
 int main()
 {
-    // Load Iris dataset (you need to replace this with your data loading code)
 
-    string filename_train = "iris_data/iris_aug_train.csv"; // Replace with your CSV file name
-    int numFeatures = 4;                                    // Number of features
-    int numLabels = 3;                                      // Number of label classes
+    constexpr size_t iris_aug_train_csv_size = sizeof(iris_aug_train_csv);
 
-    pair<MatrixXd, MatrixXd> data_train = readCSV(filename_train, numFeatures, numLabels);
+    std::istringstream iss_train(std::string(reinterpret_cast<const char *>(iris_aug_train_csv), iris_aug_train_csv_size));
+    int numFeatures = 4; // Number of features
+    int numLabels = 3;   // Number of label classes
+
+    pair<MatrixXd, MatrixXd> data_train = readCSV(iss_train, numFeatures, numLabels);
     MatrixXd X_train = data_train.first;
     MatrixXd y_train = data_train.second;
     // Create and train the neural network
@@ -163,9 +160,11 @@ int main()
 
     nn.train(X_train, y_train, learningRate, epochs);
 
-    string filename_test = "iris_data/iris_aug_test.csv"; // Replace with your CSV file name
+    constexpr size_t iris_aug_test_csv_size = sizeof(iris_aug_test_csv);
 
-    pair<MatrixXd, MatrixXd> data_test = readCSV(filename_test, numFeatures, numLabels);
+    std::istringstream iss_test(std::string(reinterpret_cast<const char *>(iris_aug_test_csv), iris_aug_test_csv_size));
+
+    pair<MatrixXd, MatrixXd> data_test = readCSV(iss_test, numFeatures, numLabels);
     MatrixXd X_test = data_test.first;
     MatrixXd y_test = data_test.second;
 
@@ -174,7 +173,8 @@ int main()
     {
         VectorXd x = X_test.row(i);
         int activatedNeurons = nn.predict(x);
-        cout << "Sample " << i + 1 << ": Activated neurons in hidden layer = " << activatedNeurons << endl;
+        // cout << "Sample " << i + 1 << ": Activated neurons in hidden layer = " << activatedNeurons << endl;
+        printf("Sample %d: Activated neurons in hidden layer = %d\n", i + 1, activatedNeurons);
     }
 
     return 0;

@@ -1,10 +1,10 @@
-APPLICATION = iris
+APPLICATION = iris_eigen
 # name of the application
 
 # If no BOARD is found in the environment, use this default:
 # BOARD ?= arduino-nano-33-ble
-BOARD ?= native
-# BOARD ?= nrf52840dk
+# BOARD ?= native
+BOARD ?= nrf52840dk
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
@@ -22,6 +22,8 @@ FEATURES_REQUIRED += libstdcpp # libstdc++ support (for #include <cstdio>)
 USEMODULE += cpp_new_delete
 USEMODULE += printf_float
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(6*THREAD_STACKSIZE_DEFAULT\)
+BLOBS+=iris_data/iris_aug_test.csv iris_data/iris_aug_train.csv
+
 # Add include path for Eigen library
 CXXINCLUDES += -I/usr/include/eigen3
 include $(RIOTBASE)/Makefile.include
