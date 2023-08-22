@@ -316,8 +316,7 @@ int main()
         accuracy += accuracy_i;
 
         if (i % 10 == 0)
-            cout << "Epoch " << (i + 1) << ", loss: " << loss << ", accuracy per iter: " << accuracy_i * 100 << "%" << endl;
-        printf("Epoch %d, loss: %.4f, accuracy per iter: %.2f%%\n", i + 1, loss, accuracy_i * 100);
+            printf("Epoch %d, loss: %.4f, accuracy per iter: %.2f%%\n", i + 1, loss, accuracy_i * 100);
     }
 
     // After training, predict and compare
