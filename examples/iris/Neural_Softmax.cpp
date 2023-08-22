@@ -8,7 +8,9 @@
 #include <sstream>
 #include <string>
 #include <cstdlib>
-#include <ctime>
+// #include <ctime>
+#include "blob/iris_aug_train.csv.h"
+#include "blob/iris_aug_test.csv.h"
 
 #define LEARNING_RATE 0.001
 #define NEPOCH 20
@@ -38,12 +40,12 @@ vector<float> softmax(vector<float> &z)
     float max_val = *max_element(z.begin(), z.end());
     vector<float> exp_values(z.size());
     float sum_exp = 0.0;
-    for (unsigned int i= 0; i < z.size(); i++)
+    for (unsigned int i = 0; i < z.size(); i++)
     {
         exp_values[i] = exp(z[i] - max_val);
         sum_exp += exp_values[i];
     }
-    for (unsigned int i= 0; i < z.size(); i++)
+    for (unsigned int i = 0; i < z.size(); i++)
     {
         exp_values[i] /= sum_exp;
     }
@@ -53,7 +55,7 @@ vector<float> softmax(vector<float> &z)
 float cross_entropy_loss(vector<float> &y, vector<float> &y_hat)
 {
     float loss = 0.0;
-    for (unsigned int i= 0; i < y.size(); i++)
+    for (unsigned int i = 0; i < y.size(); i++)
     {
         loss -= y[i] * log(y_hat[i] + 1e-9);
     }
@@ -83,7 +85,7 @@ public:
     {
         x = _x;
         float z = bias;
-        for (unsigned int i= 0; i < nInputs; ++i)
+        for (unsigned int i = 0; i < nInputs; ++i)
             z += x[i] * weights[i];
         y = isHidden ? relu(z) : (z);
         return y;
@@ -102,7 +104,7 @@ public:
     void update_weights(float dC_dy)
     {
         float dC_dz = dC_dy * dy_dz();
-        for (unsigned int i= 0; i < nInputs; ++i)
+        for (unsigned int i = 0; i < nInputs; ++i)
         {
             float dz_dw = x[i];
             float dC_dw = dC_dz * dz_dw;
@@ -125,7 +127,7 @@ public:
     Layer(int _iLayer, int _nInputs, int _nNeurons, bool isHidden = true)
         : iLayer(_iLayer), nInputs(_nInputs), nNeurons(_nNeurons)
     {
-        for (unsigned int i= 0; i < nNeurons; ++i)
+        for (unsigned int i = 0; i < nNeurons; ++i)
             neurons.push_back(Neuron(iLayer, i, nInputs, isHidden));
     }
 
@@ -141,7 +143,7 @@ public:
     {
         dC_dy = _dC_dy;
         vector<float> dC_dy__prevLayer(nInputs, 0);
-        for (unsigned int i= 0; i < nInputs; ++i)
+        for (unsigned int i = 0; i < nInputs; ++i)
         {
             for (unsigned int j = 0; j < neurons.size(); ++j)
                 dC_dy__prevLayer[i] += dC_dy[j] * neurons[j].dy_dz() * neurons[j].weights[i];
@@ -176,7 +178,7 @@ public:
     vector<float> feed(vector<float> &_x)
     {
         vector<float> x = _x;
-        for (unsigned int i= 0; i < layers.size(); i++)
+        for (unsigned int i = 0; i < layers.size(); i++)
         {
             x = layers[i].forward(x);
         }
@@ -189,10 +191,10 @@ float trainOneSample(Network &network, vector<float> &x, vector<float> &y)
     vector<float> y_hat = network.feed(x); // Now y_hat directly has softmax applied values
 
     vector<float> dC_dlogits = vector<float>(y.size());
-    for (unsigned int i= 0; i < y.size(); ++i)
+    for (unsigned int i = 0; i < y.size(); ++i)
         dC_dlogits[i] = y_hat[i] - y[i];
 
-    for ( int i= network.layers.size() - 1; i >= 0; --i)
+    for (int i = network.layers.size() - 1; i >= 0; --i)
     {
         dC_dlogits = network.layers[i].backward(dC_dlogits);
         network.layers[i].update_weights();
@@ -212,7 +214,7 @@ float trainOneEpoch(Network &network, vector<vector<float>> &X, vector<vector<fl
     auto rng = std::default_random_engine{};
     std::shuffle(indices.begin(), indices.end(), rng);
 
-    for (unsigned int i: indices)
+    for (unsigned int i : indices)
     {
         float error = trainOneSample(network, X[i], Y[i]);
         total_loss += error;
@@ -245,7 +247,7 @@ float computeAccuracy(Network &network, vector<vector<float>> &X, vector<vector<
 
 int main()
 {
-    srand(time(NULL));
+    // srand(time(NULL));
 
     vector<int> nNeuronsEachLayer = {4, 8, 3}; // Assuming 4 input features and 3 output classes
     Network network(nNeuronsEachLayer);
@@ -253,7 +255,7 @@ int main()
     vector<vector<float>> X; // Features
     vector<vector<float>> Y; // Labels
 
-    ifstream file("iris_augmented.csv");
+    ifstream file("iris_aug_train.csv");
     string line, value;
 
     while (getline(file, line))
@@ -262,7 +264,7 @@ int main()
         vector<float> features;
 
         // Read first 4 values as features
-        for (unsigned int i= 0; i < 4; ++i)
+        for (unsigned int i = 0; i < 4; ++i)
         {
             getline(ss, value, ',');
             features.push_back(stod(value));
@@ -291,7 +293,7 @@ int main()
         vector<float> features;
 
         // Read first 4 values as features
-        for (unsigned int i= 0; i < 4; ++i)
+        for (unsigned int i = 0; i < 4; ++i)
         {
             getline(ss_test, value_test, ',');
             features.push_back(stod(value_test));
@@ -309,7 +311,7 @@ int main()
     test_file.close();
 
     float accuracy = 0.0;
-    for (unsigned int i= 0; i < NEPOCH; ++i)
+    for (unsigned int i = 0; i < NEPOCH; ++i)
     {
         float loss = trainOneEpoch(network, X, Y);
         float accuracy_i = computeAccuracy(network, X_test, Y_test);
