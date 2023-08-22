@@ -252,51 +252,54 @@ int main()
     vector<int> nNeuronsEachLayer = {4, 8, 3}; // Assuming 4 input features and 3 output classes
     Network network(nNeuronsEachLayer);
 
-    vector<vector<float>> X; // Features
-    vector<vector<float>> Y; // Labels
+    vector<vector<float>> X_train; // Features
+    vector<vector<float>> Y_train; // Labels
+    constexpr size_t iris_aug_train_csv_size = sizeof(iris_aug_train_csv);
+    std::istringstream iss_train(std::string(reinterpret_cast<const char *>(iris_aug_train_csv), iris_aug_train_csv_size));
+    constexpr size_t iris_aug_test_csv_size = sizeof(iris_aug_test_csv);
+    std::istringstream iss_test(std::string(reinterpret_cast<const char *>(iris_aug_test_csv), iris_aug_test_csv_size));
+    // ifstream file("iris_aug_train.csv");
+    string line_train, value_train;
 
-    ifstream file("iris_aug_train.csv");
-    string line, value;
-
-    while (getline(file, line))
+    while (getline(iss_train, line_train))
     {
-        stringstream ss(line);
+        istringstream line_stream(line_train);
         vector<float> features;
 
         // Read first 4 values as features
         for (unsigned int i = 0; i < 4; ++i)
         {
-            getline(ss, value, ',');
-            features.push_back(stod(value));
+            getline(line_stream, value_train, ',');
+            features.push_back(stof(value_train));
         }
-        X.push_back(features);
+        X_train.push_back(features);
 
         // Read last value as label and one-hot encode
-        getline(ss, value);
-        int label = stoi(value);
+        getline(line_stream, value_train);
+        int label = stoi(value_train);
         vector<float> oneHot(3, 0.0);
         oneHot[label] = 1.0;
-        Y.push_back(oneHot);
+        Y_train.push_back(oneHot);
     }
 
-    file.close();
+    // file.close();
 
     vector<vector<float>> X_test; // Features
     vector<vector<float>> Y_test; // Labels
 
-    ifstream test_file("iris_aug_test.csv");
+    // ifstream test_file("iris_aug_test.csv");
     string line_test, value_test;
 
-    while (getline(test_file, line_test))
+    while (getline(iss_test, line_test))
     {
-        stringstream ss_test(line_test);
+        istringstream ss_test(line_test);
         vector<float> features;
 
         // Read first 4 values as features
         for (unsigned int i = 0; i < 4; ++i)
         {
             getline(ss_test, value_test, ',');
-            features.push_back(stod(value_test));
+            features.push_back(stof(value_test));
         }
         X_test.push_back(features);
 
@@ -308,12 +311,12 @@ int main()
         Y_test.push_back(oneHot);
     }
 
-    test_file.close();
+    // test_file.close();
 
     float accuracy = 0.0;
     for (unsigned int i = 0; i < NEPOCH; ++i)
     {
-        float loss = trainOneEpoch(network, X, Y);
+        float loss = trainOneEpoch(network, X_train, Y_train);
         float accuracy_i = computeAccuracy(network, X_test, Y_test);
         accuracy += accuracy_i;
 

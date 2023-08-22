@@ -1,20 +1,20 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
-// #include "blob/iris_aug_train.csv.h"
+#include "blob/iris_aug_train.csv.h"
 #include "blob/iris_aug_test.csv.h"
 
 int main()
 {
-    constexpr size_t iris_aug_test_csv_size = sizeof(iris_aug_test_csv);
+    constexpr size_t iris_aug_train_csv_size = sizeof(iris_aug_train_csv);
 
 
-    std::istringstream iss_test(std::string(reinterpret_cast<const char *>(iris_aug_test_csv), iris_aug_test_csv_size));
+    std::istringstream iss_train(std::string(reinterpret_cast<const char *>(iris_aug_train_csv), iris_aug_train_csv_size));
 
     std::string line;
     std::vector<std::vector<float>> data;
 
-    while (std::getline(iss_test, line, '\n'))
+    while (std::getline(iss_train, line, '\n'))
     {
         std::istringstream line_stream(line);
         std::string cell;
