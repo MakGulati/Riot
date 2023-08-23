@@ -3,8 +3,8 @@ APPLICATION = iris_eigen
 
 # If no BOARD is found in the environment, use this default:
 # BOARD ?= arduino-nano-33-ble
-# BOARD ?= native
-BOARD ?= nrf52840dk
+BOARD ?= native
+# BOARD ?= nrf52840dk
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
@@ -21,6 +21,8 @@ FEATURES_REQUIRED += cpp # basic C++ support
 FEATURES_REQUIRED += libstdcpp # libstdc++ support (for #include <cstdio>)
 USEMODULE += cpp_new_delete
 USEMODULE += printf_float
+USEPKG += nanocbor
+
 CFLAGS += -DTHREAD_STACKSIZE_MAIN=\(6*THREAD_STACKSIZE_DEFAULT\)
 BLOBS+=iris_data/iris_aug_test.csv iris_data/iris_aug_train.csv
 
