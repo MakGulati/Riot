@@ -2,7 +2,9 @@ APPLICATION = fourth
 # name of the application
 
 # If no BOARD is found in the environment, use this default:
-BOARD ?= arduino-nano-33-ble
+# BOARD ?= arduino-nano-33-ble
+# BOARD ?= native
+BOARD ?= nrf52840dk
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
